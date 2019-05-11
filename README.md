@@ -13,6 +13,8 @@ Here is a brief description of the files contained in this repo:
 
 **sequences_fasta**. Contains all the sequences used in the project in fasta format. Sequences are grouped by order (e.g. Colepotera) and by OTUs
 
+**trees**. Contains all the trees built in BEAST and used in this project.
+
 **OTUs**. CSV file with a table of the number of individuals from each OTU (45 OTUs total) present in each mountain (7 mountains). This file is used for calculating a presence-absence matrix
 
 ## Prerequisites
