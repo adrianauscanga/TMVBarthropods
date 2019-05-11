@@ -1,0 +1,126 @@
+---
+title: "OTUs delimitation using GMYC | Determinación de OTUs con gmyc"
+output: html_notebook
+---
+
+1. Load libraries | Se cargan las librerías necesarias
+
+```{r}
+install.packages("splits", repos = "http://R-Forge.R-project.org")
+library(splits)
+library(ape)
+library(MASS)
+library(paran)
+```
+
+2. Load and name the ultrametric tree (previously built in BEAST) | Se carga el árbol ultramétrico (usé BEAST para calcularlos). Se tiene que nombrar al árbol como objeto nuevo.
+
+```{r}
+CurcuTtree<-read.nexus("CurculionidaeTtree")
+```
+
+3. Run gmyc using CurcuTree | Se implementa gmyc con el nuevo árbol.
+
+```{r}
+CurcuTgmyc<-gmyc(CurcuTtree, method="single", interval=c(0,10),quiet=F)
+```
+
+4. Results | Resultados:
+```{r}
+CurcuTgmyc
+summary(CurcuTgmyc)
+```
+
+To change the branches namesPara cambiar la fuente de los nombres de las ramas se modifica la función (plotCluster3)
+```{r}
+plotCluster3 <- function(tr, lthresh, show.tip.label = TRUE,
+                         show.node.label = FALSE, cex = 0.5) {
+  numnod <- tr$Nnode
+  numtip <- length(tr$tip.label)
+  cdat <- array(1, 2 * numnod)
+  ndat <- array("", numnod)
+  bt <- -branching.times(tr)
+  nest.nodes <- function(tr, x, p = 0) {
+    numtip <- length(tr$tip.label)
+    nods <- array(NA, 0)
+    desc <- as.integer(tr$edge[, 2][tr$edge[, 1] == x])
+    if (desc[1] > numtip) {
+      nods <- c(nods, desc[1], nest.nodes(tr, desc[1]))
+    }
+    if (desc[2] > numtip) {
+      nods <- c(nods, desc[2], nest.nodes(tr, desc[2]))
+    }
+    if (length(nods) > 0) {
+      return(nods)
+    }
+    else {
+      return(NULL)
+    }
+  }
+  threshold.group <- function(mrcas) {
+    parent <- tr$edge[, 1]
+    child <- tr$edge[, 2]
+    thresh.group <- list()
+    thresh.time <- c()
+    mrcas <- mrcas + numtip
+    k <- 1
+    while (TRUE) {
+      times <- bt[mrcas - numtip]
+      thresh1.time <- min(times)
+      thresh1.node <- mrcas[which.min(times)]
+      mrcas <- mrcas[-which.min(times)]
+      if (length(mrcas) == 0) {
+        thresh.time <- c(thresh.time, thresh1.time)
+        thresh.group[[k]] <- thresh1.node
+        break
+      }
+      member <- thresh1.node
+      del <- c()
+      for (i in 1:length(mrcas)) {
+        par.nod <- parent[child == mrcas[i]]
+        t.par <- bt[par.nod - numtip]
+        if (t.par < thresh1.time) {
+          member <- c(member, mrcas[i])
+          del <- c(del, i)
+        }
+      }
+      thresh.time <- c(thresh.time, thresh1.time)
+      thresh.group[[k]] <- member
+      k <- k + 1
+      if (length(del) != 0) {
+        mrcas <- mrcas[-del]
+      }
+      if (length(mrcas) == 0) {
+        break
+      }
+    }
+    return(thresh.group)
+  }
+  group <- threshold.group(lthresh)
+  colors <- rainbow(length(group))
+  k <- 1
+  for (g in group) {
+    n.col.type <- rep(0, numnod)
+    for (j in 1:length(g)) {
+      n.col.type[g[j] - numtip] <- 2
+      n.col.type[nest.nodes(tr, g[j]) - numtip] <- 1
+    }
+    cdat[match(tr$edge[, 1], which((n.col.type == 1) |
+                                     (n.col.type == 2)) + numtip) > 0] <- colors[k]
+    k <- k + 1
+  }
+  plot(tr, edge.color = cdat, use.edge.length = 1, show.node.label =
+         show.node.label,
+       show.tip.label = show.tip.label, no.margin = FALSE,
+       cex = cex, font=1)
+}
+
+```
+
+Plot with the new fuction plotCluster3 | Graficarlo con la nueva función plotCluster3
+```{r}
+x<-CurcuTgmyc
+plotCluster3(x$tree, x$MRCA[[which.max(x$likelihood)]])
+```
+
+Repeat this with each taxonomic family | Se repite con cada familia taxonómica
