@@ -15,7 +15,7 @@ Here is a brief description of the files contained in this repo:
 
 **trees**. Contains all the trees built in BEAST and used in this project.
 
-**OTUs**. CSV file with a table of the number of individuals from each OTU (45 OTUs total) present in each mountain (7 mountains). This file is used for calculating a presence-absence matrix
+**OTUs**. CSV file with a table of the number of individuals from each OTU (44 OTUs total) present in each mountain (7 mountains). This file is used for calculating a presence-absence matrix. Notice there is no OTU number 9, because this was found to be product of a sequencing error in downstream analyses and thus was deleted.
 
 ## Prerequisites
 Software:
