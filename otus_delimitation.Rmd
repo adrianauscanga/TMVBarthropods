@@ -124,6 +124,29 @@ x<-CurcuTgmyc
 plotCluster3(x$tree, x$MRCA[[which.max(x$likelihood)]])
 ```
 
-Repeat this with each taxonomic family | Se repite con cada familia taxonómica
+Repeat this with each taxonomic family using a loop | Se repite con cada familia taxonómica
 
+```{r}
+
+for (i in c("CarabidaeTtree", "LinyphiidaeTtree", "GnaphosidaeTtree")){
+
+print(paste("Results for", i))
+
+# Load and name the ultrametric tree
+
+Ttree<-read.nexus(paste0("trees/",i))
+
+# run gmyc
+Tgmyc<-gmyc(Ttree, method="single", interval=c(0,10),quiet=F)
+
+# results
+Tgmyc
+summary(Tgmyc)
+
+# Plot (with previously modified plotCluster3 fun to change branches names) 
+x<-Tgmyc
+plotCluster3(x$tree, x$MRCA[[which.max(x$likelihood)]])
+}
+
+```
 
