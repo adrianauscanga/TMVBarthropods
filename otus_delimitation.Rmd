@@ -6,17 +6,18 @@ output: html_notebook
 1. Load libraries | Se cargan las librerías necesarias
 
 ```{r}
-install.packages("splits", repos = "http://R-Forge.R-project.org")
+#install.packages("splits", repos = "http://R-Forge.R-project.org")
+library(paran)
 library(splits)
 library(ape)
 library(MASS)
-library(paran)
+
 ```
 
 2. Load and name the ultrametric tree (previously built in BEAST) | Se carga el árbol ultramétrico (usé BEAST para calcularlos). Se tiene que nombrar al árbol como objeto nuevo.
 
 ```{r}
-CurcuTtree<-read.nexus("CurculionidaeTtree")
+CurcuTtree<-read.nexus("trees/CurculionidaeTtree")
 ```
 
 3. Run gmyc using CurcuTree | Se implementa gmyc con el nuevo árbol.
@@ -31,7 +32,7 @@ CurcuTgmyc
 summary(CurcuTgmyc)
 ```
 
-To change the branches namesPara cambiar la fuente de los nombres de las ramas se modifica la función (plotCluster3)
+To change the branches names | Para cambiar la fuente de los nombres de las ramas se modifica la función (plotCluster3)
 ```{r}
 plotCluster3 <- function(tr, lthresh, show.tip.label = TRUE,
                          show.node.label = FALSE, cex = 0.5) {
@@ -124,3 +125,5 @@ plotCluster3(x$tree, x$MRCA[[which.max(x$likelihood)]])
 ```
 
 Repeat this with each taxonomic family | Se repite con cada familia taxonómica
+
+
