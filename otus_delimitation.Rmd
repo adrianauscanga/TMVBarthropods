@@ -1,6 +1,8 @@
 ---
 title: "OTUs delimitation using GMYC | Determinación de OTUs con gmyc"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 1. Load libraries | Se cargan las librerías necesarias
