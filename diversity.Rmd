@@ -47,31 +47,6 @@ distOTU40
 
 Repeat with other OTUs | Se repite el procedimiento con todas las OTUs
 
-###Fst
-Load the sequence | Leer la secuencia
-```{r}
-OTU15<-read.dna("OTU15.fasta", format="fasta")
-OTU15
-class(OTU15)
-OTU15gen<-DNAbin2genind(OTU15) # adegenet format
-OTU15loci<-genind2loci(OTU15gen) # pegas format
-```
-
-Get population information (first two characters of seq name)| Obtener los datos de la población (primeros dos caracteres de la secuencia)
-```{r}
-head(labels(OTU15))
-pops<-substr(labels(OTU15), 1,2)
-pops<-as.factor(pops)
-head(pops)
-```
-
-Calculate Fst | Se estima Fst
-```{r}
-fstOTU15<-pairwise.fst(OTU15gen, pop=pops, res.type="matrix")
-fstOTU15
-```
-
-Repeat with other OTUs | Se repite con las otras OTUs
 
 ```{r, echo=FALSE}
 OTUS<-grep("OTU[1-9]", list.files("sequences_fasta"), value=TRUE)
@@ -112,6 +87,33 @@ distOTUi
 ```
 
 
+
+###Fst
+Load the sequence | Leer la secuencia
+```{r}
+OTU15<-read.dna("OTU15.fasta", format="fasta")
+OTU15
+class(OTU15)
+OTU15gen<-DNAbin2genind(OTU15) # adegenet format
+OTU15loci<-genind2loci(OTU15gen) # pegas format
+```
+
+Get population information (first two characters of seq name)| Obtener los datos de la población (primeros dos caracteres de la secuencia)
+```{r}
+head(labels(OTU15))
+pops<-substr(labels(OTU15), 1,2)
+pops<-as.factor(pops)
+head(pops)
+```
+
+Calculate Fst | Se estima Fst
+```{r}
+fstOTU15<-pairwise.fst(OTU15gen, pop=pops, res.type="matrix")
+fstOTU15
+```
+
+Repeat with other OTUs | Se repite con las otras OTUs #Alicia cuando hagas esto recuerda sacar los datos de un loop a un cuadro resumen y calcular la media.
+
 ###Haplotype networks
 
 Read sequence | Leer la secuencia
@@ -150,9 +152,10 @@ Repeat with other OTUs | Se repite con otras OTUs
 
 First, read the csv file with the list of number of individuals per OTU in each mountain. | Primero, se lee el documento csv con la lista de individuos de cada OTU por montaña
 ```{r}
-OTUs <- read_csv("OTUs.csv")
-OTUs<-OTUs[1:45,2:8] #Quitamos la columna de OTU porque es repetitiva
-View(OTUs)
+OTUs <- read.csv("OTUs.csv")
+row.names(OTUs)<-OTUs$OTU
+OTUs<-OTUs[1:44,2:8] #delete column OTU, not needed.
+OTUs
 ```
 
 Convert the csv file to matrix and tranpose the matrix so that otus are in columns and sites in rows. Then, calculate a presence-absence matrix, where each cell will be first converted to T if there are one or more individuals in a site, and F if there are 0 individuals. Then, T are transformed to 1, and F to 0. | Se traspone la matriz para que las especies sean las columnas (variables) y los sitios los renglones. Después, se calcula una matriz de presencia-ausencia, en donde cada celda es transformada en T si hay al menos un individuo o más en el sitio, y F si hay 0 individuos. Después se transforman las T en 1 y las F en 0.
@@ -160,7 +163,7 @@ Convert the csv file to matrix and tranpose the matrix so that otus are in colum
 OTUs.PA<-OTUs>0 #T and F instead of number of individuals
 mode(OTUs.PA)<-"integer" # T=1 y F=0
 head(OTUs)
-head(OTUs.PA)
+OTUs.PA
 ```
 
 Calculate a matrix distance using the function betadiver. If you want o take a look at all indeces in this function, run betadiver(HELP=T). Option 10 and 11 are similarity indeces, the rest are distance indeces. 
