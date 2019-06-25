@@ -17,7 +17,7 @@ library(vegan)
 ###Genetic distance
 Read the sequences file and convert object DNAbin to genind | lees el archivo de las secuencias y conviertes el objecto DNAbin a genind
 ```{r}
-OTU40<-read.dna("OTU40.fasta", format="fasta")
+OTU40<-read.dna("sequences_fasta/OTU40.fasta", format="fasta")
 OTU40gen<-DNAbin2genind(OTU40)
 OTU40gen
 OTU40gen@ind.names
@@ -72,6 +72,45 @@ fstOTU15
 ```
 
 Repeat with other OTUs | Se repite con las otras OTUs
+
+```{r, echo=FALSE}
+OTUS<-grep("OTU[1-9]", list.files("sequences_fasta"), value=TRUE)
+
+for (i in 1:length(OTUS)){
+
+OTU<-OTUS[i]
+
+print(paste("results for", OTU))
+
+# Read the sequences file and convert object DNAbin to genind
+
+OTUi<-read.dna(paste0("sequences_fasta/",OTU), format="fasta")
+OTUigen<-DNAbin2genind(OTUi)
+OTUigen
+OTUigen@ind.names
+
+
+# add population information (first two chars of seq name)
+
+head(labels(OTUi))
+pops<-substr(labels(OTUi), 1,2)
+pops<-as.factor(pops)
+head(pops)
+OTUigen@pop<-pops
+OTUigen@pop.names<-c("Bl","Iz","To")
+OTUigen
+
+# Convert genind object to genpop
+
+OTUipop<-genind2genpop(OTUigen)
+
+# Calculate genetic distance among populations
+distOTUi<-dist.genpop(OTUipop, method=4,diag=T,upper=F)
+distOTUi
+}
+
+```
+
 
 ###Haplotype networks
 
