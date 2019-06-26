@@ -12,6 +12,7 @@ library(adegenet)
 library(diveRsity)
 library(pegas)
 library(vegan)
+library(hierfstat)
 ```
 
 ###Genetic distance
@@ -98,7 +99,7 @@ print(distOTUi)
 ###Fst
 Load the sequence | Leer la secuencia
 ```{r}
-OTU15<-read.dna("OTU15.fasta", format="fasta")
+OTU15<-read.dna("sequences_fasta/OTU15.fasta", format="fasta")
 OTU15
 class(OTU15)
 OTU15gen<-DNAbin2genind(OTU15) # adegenet format
@@ -119,7 +120,41 @@ fstOTU15<-pairwise.fst(OTU15gen, pop=pops, res.type="matrix")
 fstOTU15
 ```
 
-Repeat with other OTUs | Se repite con las otras OTUs #Alicia cuando hagas esto recuerda sacar los datos de un loop a un cuadro resumen y calcular la media.
+Repeat with all OTUs (with polyformic sites and present in more than one mountain) | Se repite con las otras OTUs #PENDIENTE: sacar los datos de un loop a un cuadro resumen y calcular la media.
+
+```{r}
+
+OTUS<-grep("OTU[1-9]", list.files("sequences_fasta"), value=TRUE)
+
+for (i in 1:length(OTUS)) {
+
+OTU<-OTUS[i]
+
+print(paste("results for", OTU))
+
+# Load sequences
+OTUi<-read.dna(paste0("sequences_fasta/", OTU), format="fasta")
+OTUigen<-DNAbin2genind(OTUi) # adegenet format
+
+## If polymorfism detected
+if (!is.null(OTUigen)){
+OTUiloci<-genind2loci(OTUigen) # pegas format
+
+# Get population information (first two characters of seq name)
+pops<-substr(labels(OTUi), 1,2)
+pops<-as.factor(pops)
+
+## If there is more than one population:
+if(length(levels(pops))>1){
+
+# Estimate FST
+
+fstOTUi<-pairwise.fst(OTUigen, pop=pops, res.type="matrix")
+print(fstOTUi)
+    }
+  }
+}
+```
 
 ###Haplotype networks
 
