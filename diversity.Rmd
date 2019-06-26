@@ -1,6 +1,8 @@
 ---
 title: "Specific and Genetic Diversity"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 Load libraries
@@ -160,7 +162,7 @@ print(fstOTUi)
 
 Read sequence | Leer la secuencia
 ```{r}
-otu14<-read.dna("OTU14.fasta", format="fasta")
+otu14<-read.dna("sequences_fasta//OTU14.fasta", format="fasta")
 otu14
 class(otu14)
 haplosotu14<-haplotype(otu14)
@@ -189,6 +191,37 @@ plot(hnotu14, size=attr(hnotu14,"freq"), pie=hfotu14, legend=c(-10,0))
 ```
 
 Repeat with other OTUs | Se repite con otras OTUs
+
+```{r}
+OTUS<-grep("OTU[1-9]", list.files("sequences_fasta"), value=TRUE)
+
+for (i in 1:length(OTUS)) {
+
+OTU<-OTUS[i]
+
+print(paste("results for", OTU))
+
+# Read and explore haplotypes
+OTUi<-read.dna(paste0("sequences_fasta/",OTU), format="fasta")
+haplosOTUi<-haplotype(OTUi)
+print(haplosOTUi)
+
+# get pop information
+pops<-substr(labels(OTUi), 1,2)
+pops<-as.factor(pops)
+
+# Estimate haplotype freq by pop
+hfOTUi<-haploFreq(OTUi, fac=pops)
+print(hfOTUi)
+
+# If there is more than one haplotype:
+if (dim(haplosOTUi)[1]>1){
+# build haplo network
+hnOTUi<-haploNet(haplosOTUi) 
+plot(hnOTUi, size=attr(hnOTUi,"freq"), pie=hfOTUi, legend=FALSE)
+  }
+}
+```
 
 ###Beta diversity
 
