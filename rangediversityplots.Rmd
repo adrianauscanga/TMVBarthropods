@@ -1,0 +1,178 @@
+---
+title: "Range diversity plots"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Range diversity plots
+
+Based on Arita et al., 2011
+Load libraries
+```{r}
+library(vegan)
+library(permute)
+library(lattice)
+library(readr)
+```
+
+##Step 1: create the presence-absence matrix (PAM) with s rows (species) and n columns (sites).
+First, read the csv file with the list of number of individuals per OTU in each mountain. | Primero, se lee el documento csv con la lista de individuos de cada OTU por montaÃ±a
+```{r}
+OTUS <- read_csv("OTUs.csv")
+OTUS<-OTUS[1:45,2:8] #Quitamos la columna de OTU porque es repetitiva
+View(OTUS)
+```
+
+Convert the csv file to matrix and tranpose the matrix so that otus are in columns and sites in rows. Then, calculate a presence-absence matrix, where each cell will be first converted to T if there are one or more individuals in a site, and F if there are 0 individuals. Then, T are transformed to 1, and F to 0. | Se traspone la matriz para que las especies sean las columnas (variables) y los sitios los renglones. Después, se calcula una matriz de presencia-ausencia, en donde cada celda es transformada en T si hay al menos un individuo o más en el sitio, y F si hay 0 individuos. Después se transforman las T en 1 y las F en 0.
+```{r}
+OTUS.PA<-OTUS>0 #T and F instead of number of individuals
+mode(OTUS.PA)<-"integer" # T=1 y F=0
+head(OTUS)
+head(OTUS.PA)
+OTUS.PAM<- as.matrix(OTUS.PA)
+OTUS.PAMt<-t(OTUS.PAM)
+head(OTUS.PAMt)
+```
+
+##Step 2: Calculation of general parameters of range size and species richness
+
+```{r}
+Species<- nrow(OTUS.PAM)                          # S
+Quadrats<- ncol(OTUS.PAM)                         # N
+One_S<-as.matrix(seq(1, 1, length=Species))    # Vector of S 1s
+One_N<-as.matrix(seq(1, 1, length=Quadrats))   # Vector of N 1s
+SpeciesRichness<- as.matrix(colSums(OTUS.PAM))    # Vector of richness values
+RangeSize<- as.matrix(rowSums(OTUS.PAM))          # Vector of range size values
+
+Fill<- sum(RangeSize)                          # Fill of matrix
+Beta<- Species*Quadrats/Fill                   # Whittaker's beta
+
+RangeMean<- mean(RangeSize)                    # Overall mean range size
+RangeMin<- min(RangeSize)
+RangeMax<- max(RangeSize)
+D_Volume<- OTUS.PAM%*%SpeciesRichness             # Vector of diversity field volume values
+RangeRichness<- D_Volume/RangeSize             # Vector of range richness values
+SpeciesCovariance<-(OTUS.PAM%*%OTUS.PAMt-RangeSize%*%t(RangeSize)/Quadrats)/Quadrats  #Variance-covariance matrix by species
+RangeVariance<- RangeSize/Quadrats*(1-RangeSize/Quadrats)    # Vector of binary variances by species
+VarianceOfRanges<-t(RangeSize)%*%RangeSize/Species-(t(One_S)%*%RangeSize/Species)^2  # Variance of range-size values
+# This should be equal to var(RangeSize)*(Species-1)/Species
+
+RichnessMean<- mean(SpeciesRichness)           # Overall mean species richness
+RichnessMin<- min(SpeciesRichness)
+RichnessMax<- max(SpeciesRichness)
+R_Volume<- OTUS.PAMt%*%RangeSize                  # Vector of dispersion field volume values
+SiteRange<- R_Volume/SpeciesRichness           # Vector of per-site range size values
+SitesCovariance<- (OTUS.PAMt%*%OTUS.PAM-SpeciesRichness%*%t(SpeciesRichness)/Species)/Species    # Variance-covariance matrix by sites
+RichnessVariance<- SpeciesRichness/Species*(1-SpeciesRichness/Species)   #Vector of binary variances by sites
+VarianceOfRichness<-t(SpeciesRichness)%*%SpeciesRichness/Quadrats-(t(One_N)%*%SpeciesRichness/Quadrats)^2   #Variance of species-richness vlues
+#This should be equal to var(SpeciesRichness)*(Quadrats-1)/Quadrats
+
+CovarianceSpecies<- RangeSize*(RangeRichness-RichnessMean)/Quadrats/Species   #Vector of average covariance by species
+CovarianceSites<- SpeciesRichness*(SiteRange-RangeMean)/Species/Quadrats      #Vector of average covariance by sites
+
+V_species<- VarianceOfRichness/sum(RangeVariance)                              # Schluter's V by species
+V_sites<- VarianceOfRanges/sum(RichnessVariance)                               # Schluter's V by sites
+U_species<- sum(abs(RangeSize-RangeMean)/Quadrats)/Species
+U_sites<- sum(abs(SpeciesRichness-RichnessMean)/Species)/Quadrats
+```
+
+##Step 3: Draw the RD plot by species
+
+Define function species.plot
+Plot array based on Verzani, J. 2002, Using R for introductory statistics
+R help in http://www.stat.ucl.ac.be/ISdidactique/Rhelp/
+
+```{r}
+species.plot<- function() {
+def.par <-par(no.readonly = TRUE)
+xhist<- hist(RangeRichness/Species, breaks = seq(0, 1, .05), plot = FALSE)
+yhist<- hist(RangeSize/Quadrats, breaks = seq(0, 1, .05), plot = FALSE)
+topx<-max(xhist$counts)
+topy<-max(yhist$counts)
+nf<- layout(matrix(c(2, 0, 1, 3), 2, 2, T), c(6, 1), c(1, 6), TRUE)
+layout.show(nf)
+#RD plot
+par(mar= c(5, 5, 1, 1))
+plot(RangeRichness/Species, RangeSize/Quadrats, xlim = c(0,1), ylim = c(0, 1), xlab = "Proportional range richness", ylab = "Proportional range size")
+#Isocovariance lines
+x<- seq(RichnessMean/Species, 1, length = 100)
+  for(i in c(.01, .05, .1)) {
+      lines(x, i/(x- RichnessMean/Species), lwd = 2, col = "pink")
+  }
+  y<- seq(0, RichnessMean/Species, length = 100)
+  for(j in c(-.01, -.05, -.1)) {
+     lines(y, j/(y-RichnessMean/Species), lwd = 2, col = "pink")
+  }
+x<- seq(RichnessMin/Species, RichnessMean/Species, length = 100)
+lines(x, (RichnessMax-RichnessMean)/Species/(RichnessMax/Species-x), lwd = 2)
+y<- seq(RichnessMean/Species, RichnessMax/Species, length = 100)
+lines(y, (RichnessMean-RichnessMin)/Species/(y-RichnessMin/Species), lwd = 2)
+segments(RichnessMean/Species, 0, RichnessMean/Species, 1, lty = 3, lwd = 1.5)
+
+#Top histogram
+par(mar=c(0, 5, 1, 1))
+barplot(xhist$counts, axes= FALSE, ylim = c(0, topx), space =0)
+
+#Side histogram
+par(mar=c(5, 0, 1, 1))
+barplot(yhist$counts, axes = FALSE, space = 0, horiz = TRUE)
+
+par(def.par)
+}
+```
+
+##Step 4: Draw the RD plot by sites
+
+```{r}
+sites.plot<- function() {
+def.par <-par(no.readonly = TRUE)
+xhist<- hist(SiteRange/Quadrats, breaks = seq(0, 1, .05), plot = FALSE)
+yhist<- hist(SpeciesRichness/Species, breaks = seq(0, 1, .05), plot = FALSE)
+topx<-max(xhist$counts)
+topy<-max(yhist$counts)
+nf<- layout(matrix(c(2, 0, 1, 3), 2, 2, T), c(6, 1), c(1, 6), TRUE)
+layout.show(nf)
+
+#RD plot
+par(mar= c(5, 5, 1, 1))
+plot(SiteRange/Quadrats, SpeciesRichness/Species, xlim = c(0,1), ylim = c(0, 1), xlab = "Proportional per-site range", ylab = "Proportional species richness")
+
+#ISOCOVARIANCE LINES
+x<- seq(RangeMean/Quadrats, 1, length = 100)
+   for(i in c(.01, .05, .1)) {
+      lines(x, i/(x - RangeMean/Quadrats), lwd = 2, col = "pink")
+   }
+   y<- seq(0, RangeMean/Quadrats, length = 100)
+   for(j in c(-.01, -.05, -.1)) {
+      lines(y, j/(y- RangeMean/Quadrats), lwd = 2, col = "pink")
+   }
+
+x<- seq(RangeMin/Quadrats, RangeMean/Quadrats, length = 100)
+lines(x, (RangeMax-RangeMean)/Quadrats/(RangeMax/Quadrats-x), lwd = 2)
+y<- seq(RangeMean/Quadrats, RangeMax/Quadrats, length = 100)
+lines(y, (RangeMean-RangeMin)/Quadrats/(y-RangeMin/Quadrats), lwd = 2)
+segments(RangeMean/Quadrats, 0, RangeMean/Quadrats, 1, lty = 3, lwd = 1.5)
+
+#Top histogram
+par(mar=c(0, 5, 1, 1))
+barplot(xhist$counts, axes= FALSE, ylim = c(0, topx), space =0)
+
+#Side histogram
+par(mar=c(5, 0, 1, 1))
+barplot(yhist$counts, axes = FALSE, space = 0, horiz = TRUE)
+
+par(def.par)
+}
+```
+
+Display the plot by species using species.plot() and by sites using sites.plot().
+To show a parameter type the corresponing command. For example, to display the set of range size values, type RangeSize
+We still need to edit this code, why is the plot template displayed? should we change the color?
+
+```{r}
+sites.plot()
+species.plot()
+```
