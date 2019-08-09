@@ -244,6 +244,10 @@ OTUs.PA
 Calculate a matrix distance using the function betadiver. If you want o take a look at all indeces in this function, run betadiver(HELP=T). Option 10 and 11 are similarity indeces, the rest are distance indeces. 
 Make a cluster and a PCoA to visualize the results. | Se calcula una matriz de distancia usando la función betadiver. Si se quiere ver todas las opciones de índices que tiene esta función, se puede hacer con betadiver(HELP=T). Las opciones 10 y 11 son índices de similitud, todos los demás son índices de distancia. Para visualizar los resultados, se hace un cluster y un PCoA.
 ```{r}
+OTUs<-as.matrix(OTUs) #La convertimos en matriz
+OTUs<-t(OTUs) #Trasponemos la matriz para que las especies sean las columnas (variables) y los sitios los renglones.
+OTUs.PA<-OTUs>0 #T and F instead of number of individuals
+
 OTUsdist<-betadiver(OTUs.PA,method=1)
 cluster<-hclust(OTUsdist)
 plot(cluster)
