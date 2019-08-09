@@ -1,6 +1,8 @@
 ---
 title: "E-W structure using null models"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 First, read the csv file with the list of number of individuals per OTU in each mountain. | Primero, se lee el documento csv con la lista de individuos de cada OTU por montaña
