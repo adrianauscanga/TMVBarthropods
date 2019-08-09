@@ -22,7 +22,7 @@ library(readr)
 First, read the csv file with the list of number of individuals per OTU in each mountain. | Primero, se lee el documento csv con la lista de individuos de cada OTU por montaÃ±a
 ```{r}
 OTUS <- read_csv("OTUs.csv")
-OTUS<-OTUS[1:45,2:8] #Quitamos la columna de OTU porque es repetitiva
+OTUS<-OTUS[1:44,2:8] #Quitamos la columna de OTU porque es repetitiva
 View(OTUS)
 ```
 
