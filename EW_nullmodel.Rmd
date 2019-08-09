@@ -38,7 +38,7 @@ W1<-OTUs.PA[4:7,] #vector W
 W1<-colSums(W1)
 EW1<-matrix(data=(c(E1,W1)),nrow=2,ncol=44,byrow=T,dimnames=list(c("E1","W1"))) #Build matrix E-W
 EW1
-sim1st<-oecosimu(EW1,nestedbetasor,method="r00",nsimul=999) #randomize sites
+sim1st<-oecosimu(EW1,nestedbetasor,method="r0",nsimul=999) #randomize sites
 
 #plot
 dplot1st<-densityplot(permustats(sim1st))
