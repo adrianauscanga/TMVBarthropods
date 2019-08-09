@@ -3,6 +3,30 @@ title: "E-W structure using null models"
 output: html_notebook
 ---
 
+First, read the csv file with the list of number of individuals per OTU in each mountain. | Primero, se lee el documento csv con la lista de individuos de cada OTU por montaña
+```{r}
+OTUs <- read.csv("OTUs.csv")
+row.names(OTUs)<-OTUs$OTU
+OTUs<-OTUs[1:44,2:8] #delete column OTU, not needed.
+OTUs
+```
+
+Convert the csv file to matrix and tranpose the matrix so that otus are in columns and sites in rows. Then, calculate a presence-absence matrix, where each cell will be first converted to T if there are one or more individuals in a site, and F if there are 0 individuals. Then, T are transformed to 1, and F to 0. | Se traspone la matriz para que las especies sean las columnas (variables) y los sitios los renglones. Después, se calcula una matriz de presencia-ausencia, en donde cada celda es transformada en T si hay al menos un individuo o más en el sitio, y F si hay 0 individuos. Después se transforman las T en 1 y las F en 0.
+```{r}
+OTUs<-as.matrix(OTUs) #La convertimos en matriz
+OTUs<-t(OTUs) #Trasponemos la matriz para que las especies sean las columnas (variables) y los sitios los renglones.
+image(t(log(OTUs+1)), axes=FALSE, ylab="sites", xlab="OTU") #Se ve en la imagen los valores de abundancia, los colores rojos indican abundancias bajas, amarillo a blancos indica abundancias altas.
+
+OTUs.PA<-OTUs>0 #T and F instead of number of individuals
+mode(OTUs.PA)<-"integer" # T=1 y F=0
+head(OTUs)
+OTUs.PA
+```
+
+
+
+
+
 In a null model, empirical data are compared to simulated data using the function oecosimu. The presence-absence matrix (explained in diversity.Rmd) is used to calculate beta diversity. I made two groups representing eastern and western mountains. Since there are 7 mountains, 34 combinations of eastern-western mountains different than the real one can exist. After making two groups of mountains in 34 possible combinations, data are randomized between the two groups. This way, 34 randomized groups are compared with the actual E-W structure we are testing. | Se comparan los datos empíricos con datos simulados con la función oecosimu. Se usa la base de datos de presencia-ausencia construida para calcular la diversidad beta. Hice dos grupos que representan montañas del Este y montañas del Oeste. Debido a que hay 7 montañas, existen 34 posibles combinaciones de agrupamientos E-O. Después de hacer dos grupos de montañas con las 34 posibles combinaciones, los datos fueron aleatorizados entre los dos grupos. De esta manera, los 34 grupos aleatorios son comárados con el agrupamiento que representa la estructura E-O que se está poniendo a prueba.
 
 ```{r}
@@ -12,10 +36,12 @@ E1<-OTUs.PA[1:3,] # vector E
 E1<-colSums(E1) #Add all species from these 3 mountains
 W1<-OTUs.PA[4:7,] #vector W
 W1<-colSums(W1)
-EW1<-matrix(data=(c(E1,W1)),nrow=2,ncol=45,byrow=T,dimnames=list(c("E1","W1"))) #Build matrix E-W
+EW1<-matrix(data=(c(E1,W1)),nrow=2,ncol=44,byrow=T,dimnames=list(c("E1","W1"))) #Build matrix E-W
 EW1
-sim1st<-oecosimu(EW1,nestedbetasor,method="r0",nsimul=999) #randomize sites
-dplot1st<-densityplot(sim1st, par.strip.text=list(cex=1.3),lwd=2,obs.line("red"),par.settings=list(par.xlab.text=lis(cex=1.5), par.ylab.text=list(cex=1.5)))
+sim1st<-oecosimu(EW1,nestedbetasor,method="r00",nsimul=999) #randomize sites
+
+#plot
+dplot1st<-densityplot(permustats(sim1st))
 dplot1st
 ```
 
