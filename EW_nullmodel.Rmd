@@ -41,6 +41,8 @@ W1<-colSums(W1)
 EW1<-matrix(data=(c(E1,W1)),nrow=2,ncol=44,byrow=T,dimnames=list(c("E1","W1"))) #Build matrix E-W
 EW1
 sim1st<-oecosimu(EW1,nestedbetasor,method="r0",nsimul=999) #randomize sites
+sim1st
+c(sim1st$statistic[1:3], sim1st$oecosimu$pval[1:3]) # get diversity statistics and their pvalue
 
 #plot
 dplot1st<-densityplot(permustats(sim1st))
@@ -58,6 +60,28 @@ OTUsdist<-betadiver(OTUs.PA,method=1)
 vec1<-c(rep("W",3),rep("E",4)) #E-W vector
 AV1<-adonis(OTUsdist~as.factor(vec1),permutation=999)
 AV1
+AV1$aov.tab$Pr[1]
 ```
 
 Repeat with all the other 34 combinations. | Se repite con los otros 34 agrupamientos de montañas 
+
+
+
+```{r}
+
+#function to run the permutation analysis and print the p-value
+pval.permu<-function(OTUs.PA, vec){
+              # OTUs.PA is the transposed otu matrix
+              # Vec is the Eeast / West division that wants to be tested, expressed as character vector with W, E for each mountain.
+              OTUsdist<-betadiver(OTUs.PA,method=1)
+              AV<-adonis(OTUsdist~as.factor(vec),permutation=999)
+              AV$aov.tab$Pr[1]
+              }
+
+
+pval.permu(OTUs.PA = OTUs.PA, vec=c(rep("W",3),rep("E",4)))
+pval.permu(OTUs.PA = OTUs.PA, vec=c("W","W","E","W","E","E","E"))
+
+```
+
+
