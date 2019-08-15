@@ -11,6 +11,8 @@ Load libraries:
 library(ape)
 library(paran)
 library(splits)
+library(ggplot2)
+library(dplyr)
 ```
 
 Modify the plot function from splits (add a 2 so R don't get confused) | Se modifica la función de graficar del paquete splits (se agrega un 2 para que R no se confunda)
@@ -117,7 +119,7 @@ samtips<-substr((x$tr)$tip.label, 3,3)
 samtips #habitat
 #Definir color por tipo de vegetación (samtips)
 samtips<-as.factor(samtips)
-levels(samtips)<-c("darkolivegreen3", "orange")
+levels(samtips)<-c("darkolivegreen3", "darkorange")
 samtips
 
 # plot according to habitat type
@@ -143,7 +145,7 @@ samtips<-substr((x$tr)$tip.label, 3,3)
 samtips #habitat
 #Definir color por tipo de vegetación (samtips)
 samtips<-as.factor(samtips)
-levels(samtips)<-c("darkolivegreen3", "orange")
+levels(samtips)<-c("darkolivegreen3", "darkorange")
 samtips
 
 # plot according to habitat type
@@ -168,7 +170,7 @@ samtips<-substr((x$tr)$tip.label, 3,3)
 samtips #habitat
 #Definir color por tipo de vegetación (samtips)
 samtips<-as.factor(samtips)
-levels(samtips)<-c("darkolivegreen3", "orange")
+levels(samtips)<-c("darkolivegreen3", "darkorange")
 samtips
 
 # plot according to habitat type
@@ -193,7 +195,7 @@ samtips<-substr((x$tr)$tip.label, 3,3)
 samtips #habitat
 #Definir color por tipo de vegetación (samtips)
 samtips<-as.factor(samtips)
-levels(samtips)<-c("darkolivegreen3", "orange")
+levels(samtips)<-c("darkolivegreen3", "darkorange")
 samtips
 
 # plot according to habitat type
@@ -205,8 +207,46 @@ tiplabels(text=nomtips, frame="none", col="black", cex=0.6, adj=-0.4)
 
 
 
-Bar plots OTU abundance
+Bar plots of all OTU abundance by habitat type
 ```{r}
-# Before doing this Alicia whants to know how the bar plot of OTUs abundance/ habitat was done.
+# read data
+samples_otus<-read.delim("samples_OTUs.txt") %>%
+              dplyr::arrange(., OTU) %>% # order by otu
+              mutate(., OTU=as.factor(OTU)) # otu as character not number
+
+levels(samples_otus$OTU)<-unique(samples_otus$OTU) # add levels so that it plots nice (cant use integer because there is not otu 9)
+
+# plot
+ggplot(samples_otus, aes(x=OTU, fill=vegetation_type)) +
+    geom_bar() + theme_bw() +
+    scale_fill_manual(values=c("darkolivegreen3", "darkorange"),
+                      name="Vegetation type") +
+    theme(legend.title=element_text(size=13),
+          legend.text=element_text(size=12),
+          axis.title.x = element_text(size=13),
+          axis.title.y = element_text(size=13),
+          axis.text.x = element_text(size=12),
+          axis.text.y = element_text(size=12)) +
+    scale_x_discrete(breaks=seq(0,40,5))
+
+
+```
+
+Bar plot by family:
+
+```{r}
+ggplot(samples_otus, aes(x=OTU, fill=vegetation_type)) +
+    geom_bar() +  theme_bw() +
+  facet_wrap(. ~ family, scales="free_x")  +
+  scale_fill_manual(values=c("darkolivegreen3", "darkorange"),
+                      name="Vegetation type") +
+    theme(legend.title=element_text(size=13),
+          legend.text=element_text(size=12),
+          axis.title.x = element_text(size=13),
+          axis.title.y = element_text(size=13),
+          axis.text.x = element_text(size=10),
+          axis.text.y = element_text(size=12),
+          strip.text = element_text(size=12)) +
+      scale_x_discrete(breaks=c(1:11, seq(12,37,3), 39:45))
 ```
 
