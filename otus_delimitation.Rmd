@@ -16,6 +16,7 @@ library(MASS)
 
 ```
 
+
 2. Load and name the ultrametric tree (previously built in BEAST) | Se carga el árbol ultramétrico (usé BEAST para calcularlos). Se tiene que nombrar al árbol como objeto nuevo.
 
 ```{r}
@@ -32,6 +33,7 @@ CurcuTgmyc<-gmyc(CurcuTtree, method="single", interval=c(0,10),quiet=F)
 ```{r}
 CurcuTgmyc
 summary(CurcuTgmyc)
+plot(CurcuTgmyc)
 ```
 
 To change the branches names | Para cambiar la fuente de los nombres de las ramas se modifica la función (plotCluster3)
@@ -144,6 +146,7 @@ Tgmyc<-gmyc(Ttree, method="single", interval=c(0,10),quiet=F)
 # results
 Tgmyc
 summary(Tgmyc)
+plot(Tgmyc)
 
 # Plot (with previously modified plotCluster3 fun to change branches names) 
 x<-Tgmyc
