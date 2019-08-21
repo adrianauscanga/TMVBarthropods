@@ -50,38 +50,3 @@ dplot1st
 ```
 
 Repeat with other 34 combinations | Se repite el mismo procedimiento con los otros 34 agrupamientos de montañas.
-
-###Analysis of variance with permutations
-
-Use the same presence-absence matrix | Se usa la misma matriz de presencia-ausencia de OTUs
-Group1: W=An,Bl,To E=Aj,Iz,Ma,Pe
-```{r}
-OTUsdist<-betadiver(OTUs.PA,method=1)
-vec1<-c(rep("W",3),rep("E",4)) #E-W vector
-AV1<-adonis(OTUsdist~as.factor(vec1),permutation=999)
-AV1
-AV1$aov.tab$Pr[1]
-```
-
-Repeat with all the other 34 combinations. | Se repite con los otros 34 agrupamientos de montañas 
-
-
-
-```{r}
-
-#function to run the permutation analysis and print the p-value
-pval.permu<-function(OTUs.PA, vec){
-              # OTUs.PA is the transposed otu matrix
-              # Vec is the Eeast / West division that wants to be tested, expressed as character vector with W, E for each mountain.
-              OTUsdist<-betadiver(OTUs.PA,method=1)
-              AV<-adonis(OTUsdist~as.factor(vec),permutation=999)
-              AV$aov.tab$Pr[1]
-              }
-
-
-pval.permu(OTUs.PA = OTUs.PA, vec=c(rep("W",3),rep("E",4)))
-pval.permu(OTUs.PA = OTUs.PA, vec=c("W","W","E","W","E","E","E"))
-
-```
-
-
