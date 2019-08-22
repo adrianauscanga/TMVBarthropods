@@ -49,4 +49,50 @@ dplot1st<-densityplot(permustats(sim1st))
 dplot1st
 ```
 
-Repeat with other 34 combinations | Se repite el mismo procedimiento con los otros 34 agrupamientos de montañas.
+Repeat with all 35 combinations | Se repite el mismo procedimiento con los 35 agrupamientos de montañas.
+
+
+```{r, warning=FALSE}
+## Read file with the 35 groupings
+
+EW_groups<-read.delim("EW_groups.txt", stringsAsFactors = FALSE)
+
+## Perform analysis in a loop
+div_results<-as.numeric() # to save div results 
+for(i in c(1:35)){
+# get character vector of group W and E
+  
+W<-strsplit(EW_groups[i,2], ",")[[1]] 
+print(paste("results for grouping", i , "W:"))
+print(W)
+E<-strsplit(EW_groups[i,3], ",")[[1]]
+print("and E:")
+print(E)
+      
+# Get matrix for group i
+W<-OTUs.PA[W,]
+E<-OTUs.PA[E,]
+W<-colSums(W)
+E<-colSums(E)
+EW<-matrix(data=(c(E,W)),nrow=2,ncol=44,byrow=T,dimnames=list(c("E","W")))
+
+# Run analysis
+sim1st<-oecosimu(EW,nestedbetasor,method="r0",nsimul=999) #randomize sites
+print(sim1st)
+x<-c(sim1st$statistic[1:3], sim1st$oecosimu$pval[1:3]) # get diversity statistics and their pvalue
+div_results<-rbind(div_results,x) # save in table outside loop
+
+# #plot
+dplot1st<-densityplot(permustats(sim1st))
+print(dplot1st)
+}
+
+colnames(div_results)[4:6]<-c("p_turnoever", "p_nestedness", "p_sorensen")
+rownames(div_results)<-NULL
+div_results<-round(div_results[,],4)
+EW_results<-cbind(EW_groups, div_results)
+EW_results
+
+
+```
+
