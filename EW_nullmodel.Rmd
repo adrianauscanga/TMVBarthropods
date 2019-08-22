@@ -60,8 +60,8 @@ EW_groups<-read.delim("EW_groups.txt", stringsAsFactors = FALSE)
 ## Perform analysis in a loop
 div_results<-as.numeric() # to save div results 
 for(i in c(1:35)){
+
 # get character vector of group W and E
-  
 W<-strsplit(EW_groups[i,2], ",")[[1]] 
 print(paste("results for grouping", i , "W:"))
 print(W)
@@ -90,9 +90,46 @@ print(dplot1st)
 colnames(div_results)[4:6]<-c("p_turnoever", "p_nestedness", "p_sorensen")
 rownames(div_results)<-NULL
 div_results<-round(div_results[,],4)
-EW_results<-cbind(EW_groups, div_results)
-EW_results
+EW_results_null_model<-cbind(EW_groups, div_results)
+EW_results_null_model
 
 
 ```
+
+Perform an analysis of variance with permultations | Análisis de varianza con permutaciones
+
+```{r}
+
+permu_results<-numeric()
+for(i in 1:35){
+# get character vector of group W and E
+W<-strsplit(EW_groups[i,2], ",")[[1]] 
+print(paste("results for grouping", i , "W:"))
+print(W)
+E<-strsplit(EW_groups[i,3], ",")[[1]]
+print("and E:")
+print(E)
+  
+  
+## Generate EW vector for each grouping
+vec<-c(W, E)
+vec<-sub("An|Bl|To", "W", vec) 
+vec<-sub("Aj|Iz|Ma|Pe", "E", vec)
+
+
+## run permutation analyses
+set.seed(100) #set seed to get same results every run
+OTUsdist<-betadiver(OTUs.PA,method=1)
+AV<-adonis(OTUsdist~as.factor(vec),permutation=999)
+AV
+permu_results<-rbind(permu_results, AV$aov.tab$Pr[1])
+}
+
+EW_results_permu<-cbind(EW_groups, permu_results)
+colnames(EW_results_permu)[4]<-"p_value"
+EW_results_permu
+
+```
+
+
 
