@@ -16,6 +16,8 @@ library(vegan)
 library(permute)
 library(lattice)
 library(readr)
+library(EcoSimR)
+library(MASS)
 ```
 
 ##Step 1: create the presence-absence matrix (PAM) with s rows (species) and n columns (sites).
@@ -176,3 +178,17 @@ We still need to edit this code, why is the plot template displayed? should we c
 sites.plot()
 species.plot()
 ```
+
+##Null models
+Now I'll randomize the matrix to compare the empirical matrix to random ones, like in a null model. Using library EcoSimR. The function ra3 
+
+```{r}
+nm <- ra3(OTUS.PAMt)
+nm
+dim(nm)
+```
+To get many matrices, I'll use a loop:
+```{r}
+
+```
+
