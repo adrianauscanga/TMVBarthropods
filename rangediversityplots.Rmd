@@ -99,14 +99,15 @@ layout.show(nf)
 #RD plot
 par(mar= c(5, 5, 1, 1))
 plot(RangeRichness/Species, RangeSize/Quadrats, xlim = c(0,1), ylim = c(0, 1), xlab = "Proportional range richness", ylab = "Proportional range size")
+
 #Isocovariance lines
 x<- seq(RichnessMean/Species, 1, length = 100)
   for(i in c(.01, .05, .1)) {
-      lines(x, i/(x- RichnessMean/Species), lwd = 2, col = "pink")
+      lines(x, i/(x- RichnessMean/Species), lwd = 1, col = "grey")
   }
   y<- seq(0, RichnessMean/Species, length = 100)
   for(j in c(-.01, -.05, -.1)) {
-     lines(y, j/(y-RichnessMean/Species), lwd = 2, col = "pink")
+     lines(y, j/(y-RichnessMean/Species), lwd = 1, col = "grey")
   }
 x<- seq(RichnessMin/Species, RichnessMean/Species, length = 100)
 lines(x, (RichnessMax-RichnessMean)/Species/(RichnessMax/Species-x), lwd = 2)
@@ -140,16 +141,17 @@ layout.show(nf)
 
 #RD plot
 par(mar= c(5, 5, 1, 1))
-plot(SiteRange/Quadrats, SpeciesRichness/Species, xlim = c(0,1), ylim = c(0, 1), xlab = "Proportional per-site range", ylab = "Proportional species richness")
+plot(SiteRange/Quadrats, SpeciesRichness/Species, xlim = c(0,1), ylim = c(0, 1), xlab = "Proportional per-site range", ylab = "Proportional species richness", type="n")
+text(SiteRange/Quadrats, SpeciesRichness/Species, labels=as.character(row.names(OTUS.PAMt)), cex=0.8)
 
 #ISOCOVARIANCE LINES
 x<- seq(RangeMean/Quadrats, 1, length = 100)
    for(i in c(.01, .05, .1)) {
-      lines(x, i/(x - RangeMean/Quadrats), lwd = 2, col = "pink")
+      lines(x, i/(x - RangeMean/Quadrats), lwd = 1, col = "grey")
    }
    y<- seq(0, RangeMean/Quadrats, length = 100)
    for(j in c(-.01, -.05, -.1)) {
-      lines(y, j/(y- RangeMean/Quadrats), lwd = 2, col = "pink")
+      lines(y, j/(y- RangeMean/Quadrats), lwd = 1, col = "grey")
    }
 
 x<- seq(RangeMin/Quadrats, RangeMean/Quadrats, length = 100)
