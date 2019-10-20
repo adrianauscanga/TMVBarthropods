@@ -122,10 +122,11 @@ plotCluster3 <- function(tr, lthresh, show.tip.label = TRUE,
 
 ```
 
-Plot with the new fuction plotCluster3 | Graficarlo con la nueva función plotCluster3
+Plot with the new fuction plotCluster3 and add edges number to know wich one correspodns to each OTU| Graficarlo con la nueva función plotCluster3
 ```{r}
 x<-CurcuTgmyc
 plotCluster3(x$tree, x$MRCA[[which.max(x$likelihood)]])
+edgelabels(frame="none", adj = c(0.5, -0.25), cex=0.5)
 ```
 
 Repeat this with each taxonomic family using a loop | Se repite con cada familia taxonómica
@@ -151,6 +152,7 @@ plot(Tgmyc)
 # Plot (with previously modified plotCluster3 fun to change branches names) 
 x<-Tgmyc
 plotCluster3(x$tree, x$MRCA[[which.max(x$likelihood)]])
+edgelabels(frame="none", adj = c(0.5, -0.25), cex=0.8)
 }
 
 ```

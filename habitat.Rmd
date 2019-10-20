@@ -15,6 +15,53 @@ library(ggplot2)
 library(dplyr)
 ```
 
+
+Bar plots of all OTU abundance by habitat type
+```{r}
+# read data
+samples_otus<-read.delim("samples_OTUs.txt") %>%
+              dplyr::arrange(., OTU) %>% # order by otu
+              mutate(., OTU=as.factor(OTU)) # otu as character not number
+
+levels(samples_otus$OTU)<-unique(samples_otus$OTU) # add levels so that it plots nice (cant use integer because there is not otu 9)
+
+# plot
+ggplot(samples_otus, aes(x=OTU, fill=vegetation_type)) +
+    geom_bar() + theme_bw() +
+    scale_fill_manual(values=c("darkolivegreen3", "darkorange"),
+                      name="Vegetation type") +
+    theme(legend.title=element_text(size=13),
+          legend.text=element_text(size=12),
+          axis.title.x = element_text(size=13),
+          axis.title.y = element_text(size=13),
+          axis.text.x = element_text(size=12),
+          axis.text.y = element_text(size=12)) +
+    scale_x_discrete(breaks=seq(0,40,5))
+
+
+```
+
+Bar plot by family:
+
+```{r}
+ggplot(samples_otus, aes(x=OTU, fill=vegetation_type)) +
+    geom_bar() +  theme_bw() +
+  facet_wrap(. ~ family, scales="free_x")  +
+  scale_fill_manual(values=c("darkolivegreen3", "darkorange"),
+                      name="Vegetation type") +
+    theme(legend.title=element_text(size=13),
+          legend.text=element_text(size=12),
+          axis.title.x = element_text(size=13),
+          axis.title.y = element_text(size=13),
+          axis.text.x = element_text(size=10),
+          axis.text.y = element_text(size=12),
+          strip.text = element_text(size=12)) +
+      scale_x_discrete(breaks=c(1:11, seq(12,37,3), 39:45))
+```
+
+
+Now plot nice trees.
+
 Modify the plot function from splits (add a 2 so R don't get confused) | Se modifica la función de graficar del paquete splits (se agrega un 2 para que R no se confunda)
 ```{r}
 plotCluster2 <- function(tr, lthresh, show.tip.label = FALSE, # tip labels to FALSE
@@ -102,7 +149,6 @@ cex = cex, edge.width=edge.width)
 ```
 
 
-
 Use the trees resulted from the GMYC analysis (see "otus_delimitation.Rmd"). First, get population names and habitat from sequences names. B corresponds to forest and Z to alpine grasslands. | Se usan los árboles que resultaron del análisis GMYC (explicado en "otus_delimitation.Rmd"). Primero, se obtienen los nombres de las poblaciones y el tipo de vegetación de los nombres de las secuencias. B corresponde a bosques, y Z a pastizal alpino.
 
 ```{r, fig.width=12, fig.height=7}
@@ -126,6 +172,9 @@ samtips
 plotCluster2(x$tree, x$MRCA[[which.max(x$likelihood)]], edge.width=2)
 tiplabels(pch=15, col=as.vector(samtips), adj=0, offset=0.51, cex=1.5)
 tiplabels(text=nomtips, frame="none", col="black", cex=1, adj=0, offset = 0.018)
+
+# add OTU names
+edgelabels(text=c("OTU 5", "OTU 4", "OTU 3", "OTU 2", "OTU 7", "OTU 6", "OTU 1"), edge=c(54, 51, 24, 15, 14, 13, 4), frame="none", adj = c(0.5, -0.25), cex=.7, date= .09)
 
 # plot Time vs likelihood
 plot(x$threshold.time, x$likelihood,type = "l", xlab = "Time", ylab = "Likelihood", cex.lab=1.5, cex.axis=1.5)
@@ -169,10 +218,13 @@ tiplabels(pch=15, col=as.vector(samtips), adj=0, offset=0.51, cex=1.5)
 tiplabels(text=nomtips, frame="none", col="black", cex=1, adj=0, offset = 0.018)
 title(main="Curculionidae (Coleoptera) \na)",adj=0, cex.main=1.5)
 
+# add OTU names
+edgelabels(text=c("OTU 5", "OTU 4", "OTU 3", "OTU 2", "OTU 7", "OTU 6", "OTU 1"), edge=c(54, 51, 24, 15, 14, 13, 4), frame="none", adj = c(0.5, -0.25), cex=.7, date= .09)
+
 # plot Time vs likelihood
 par(mar=c(4, 4, 2, 4))
 plot(x$threshold.time, x$likelihood,type = "l", xlab = "Time", ylab = "Likelihood", cex.lab=1.5, cex.axis=1.5, lwd=2)
-title(main="b)",adj=0, cex.main=1.5)
+title(main="a)",adj=0, cex.main=1.5)
 
 # plot time vs number of entityes and threshold time
 par(mar=c(4, 4, 2, 4))
@@ -214,6 +266,9 @@ tiplabels(pch=15, col=as.vector(samtips), adj=0, offset=0.51, cex=1.5)
 tiplabels(text=nomtips, frame="none", col="black", cex=1, adj=0, offset = 0.018)
 title("Carabidae (Coleoptera) \nb)",adj=0, cex.main=1.5)
 
+# add OTU names
+edgelabels(text=c("OTU 11", "OTU 10"), edge=c(38,1), frame="none", adj = c(0.5, -0.25), cex=.8, date= .2)
+
 # plot Time vs likelihood
 par(mar=c(4, 4, 2, 4))
 plot(x$threshold.time, x$likelihood,type = "l", xlab = "Time", ylab = "Likelihood", cex.lab=1.5, cex.axis=1.5, lwd=2)
@@ -227,7 +282,47 @@ title(main="c)",adj=0, cex.main=1.5)
 ```
 
 
-Linyphiidae
+Linyphiidae. 
+
+This family has many OTUs, check OTU names were assigned correctly
+```{r, results= "hide", fig.width=13, fig.height=32}
+Ttree<-read.nexus("trees/LinyphiidaeTtree")
+
+# run gmyc
+Tgmyc<-gmyc(Ttree, method="single", interval=c(0,10),quiet=F)
+
+x<-Tgmyc
+samtips<-substr((x$tr)$tip.label, 3,3)
+samtips #habitat
+#Definir color por tipo de vegetación (samtips)
+samtips<-as.factor(samtips)
+levels(samtips)<-c("darkolivegreen3", "darkorange")
+samtips
+
+# get which CROP OTU is each tip
+nomtips<-(x$tr)$tip.label
+nomtips<-as.data.frame(nomtips)
+
+otu_tips<-inner_join(nomtips, samples_otus, by=c("nomtips"="sample_id"))
+
+####
+
+# plot tree according to habitat type and otus name
+par(mar=c(0, 4, 2.5, 4))
+plotCluster2(x$tree, x$MRCA[[which.max(x$likelihood)]], edge.width=2)
+tiplabels(pch=15, col=as.vector(samtips), adj=0, offset=0.51, cex=1.5)
+tiplabels(text=otu_tips$OTU, frame="none", col="black", cex=.50, adj=0, offset = 0.006)
+tiplabels(text=(x$tr)$tip.label, frame="none", col="black", cex=.4, adj=0, offset= 0.016)
+title("Linyphiidae (Aranae) \nc)",adj=0, cex.main=1.5)
+
+# add OTU names
+edgelabels(text=c("OTU 31", "OTU 28", "OTU 27",  "OTU 34", "OTU 26", "OTU 38", "OTU 25", "OTU 24", "OTU 23", "OTU 29", "OTU 22", "OTU 21", "OTU 20", "OTU 19", "OTU 18", "OTU 33", "OTU 18", "OTU 35", "OTU 17", "OTU 16", "OTU 32", "OTU 15", "OTU 14", "OTU 13", "OTU 36", "OTU 30", "OTU 37", "OTU 12"), 
+           edge=c(256, 245, 236, 235, 220, 215, 203, 196, 192, 190, 187, 180, 159, 150, 130, 129, 122, 118, 103, 100, 98, 62, 37, 15, 13, 9, 8, 2),
+           frame="none", adj = c(0.5, -0.25), cex=.6)
+```
+
+
+Now nice plot:
 ```{r, echo=FALSE, results= "hide", fig.width=12, fig.height=32}
 Ttree<-read.nexus("trees/LinyphiidaeTtree")
 
@@ -255,6 +350,11 @@ plotCluster2(x$tree, x$MRCA[[which.max(x$likelihood)]], edge.width=2)
 tiplabels(pch=15, col=as.vector(samtips), adj=0, offset=0.51, cex=1.5)
 tiplabels(text=nomtips, frame="none", col="black", cex=1, adj=0, offset = 0.018)
 title("Linyphiidae (Aranae) \nc)",adj=0, cex.main=1.5)
+
+# add OTU names
+edgelabels(text=c("OTU 31", "OTU 28", "OTU 27",  "OTU 34", "OTU 26", "OTU 38", "OTU 25", "OTU 24", "OTU 23", "OTU 29", "OTU 22", "OTU 21", "OTU 20", "OTU 19", "OTU 18", "OTU 33", "OTU 18", "OTU 35", "OTU 17", "OTU 16", "OTU 32", "OTU 15", "OTU 14", "OTU 13", "OTU 36", "OTU 30", "OTU 37", "OTU 12"), 
+           edge=c(256, 245, 236, 235, 220, 215, 203, 196, 192, 190, 187, 180, 159, 150, 130, 129, 122, 118, 103, 100, 98, 62, 37, 15, 13, 9, 8, 2),
+           frame="none", adj = c(0.5, -0.25), cex=.6)
 
 # plot Time vs likelihood
 par(mar=c(4, 4, 2, 4))
@@ -297,6 +397,10 @@ tiplabels(pch=15, col=as.vector(samtips), adj=0, offset=0.51, cex=1.5)
 tiplabels(text=nomtips, frame="none", col="black", cex=1, adj=0, offset = 0.018)
 title("Gnaphosidae (Aranae) \nd)",adj=0, cex.main=1.5)
 
+# Plot OTUs name
+edgelabels(text=c("OTU 45", "OTU 44", "OTU 43", "OTU 42", "OTU 41", "OTU 40", "OTU 39"), edge=c(38, 35, 32, 26, 23, 10, 3), frame="none", adj = c(0.5, -0.25), cex=.8, date= .1)
+
+
 # plot Time vs likelihood
 par(mar=c(4, 4, 2, 4))
 plot(x$threshold.time, x$likelihood,type = "l", xlab = "Time", ylab = "Likelihood", cex.lab=1.5, cex.axis=1.5, lwd=2)
@@ -310,48 +414,4 @@ title(main="c)",adj=0, cex.main=1.5)
 ```
 
 
-
-
-Bar plots of all OTU abundance by habitat type
-```{r}
-# read data
-samples_otus<-read.delim("samples_OTUs.txt") %>%
-              dplyr::arrange(., OTU) %>% # order by otu
-              mutate(., OTU=as.factor(OTU)) # otu as character not number
-
-levels(samples_otus$OTU)<-unique(samples_otus$OTU) # add levels so that it plots nice (cant use integer because there is not otu 9)
-
-# plot
-ggplot(samples_otus, aes(x=OTU, fill=vegetation_type)) +
-    geom_bar() + theme_bw() +
-    scale_fill_manual(values=c("darkolivegreen3", "darkorange"),
-                      name="Vegetation type") +
-    theme(legend.title=element_text(size=13),
-          legend.text=element_text(size=12),
-          axis.title.x = element_text(size=13),
-          axis.title.y = element_text(size=13),
-          axis.text.x = element_text(size=12),
-          axis.text.y = element_text(size=12)) +
-    scale_x_discrete(breaks=seq(0,40,5))
-
-
-```
-
-Bar plot by family:
-
-```{r}
-ggplot(samples_otus, aes(x=OTU, fill=vegetation_type)) +
-    geom_bar() +  theme_bw() +
-  facet_wrap(. ~ family, scales="free_x")  +
-  scale_fill_manual(values=c("darkolivegreen3", "darkorange"),
-                      name="Vegetation type") +
-    theme(legend.title=element_text(size=13),
-          legend.text=element_text(size=12),
-          axis.title.x = element_text(size=13),
-          axis.title.y = element_text(size=13),
-          axis.text.x = element_text(size=10),
-          axis.text.y = element_text(size=12),
-          strip.text = element_text(size=12)) +
-      scale_x_discrete(breaks=c(1:11, seq(12,37,3), 39:45))
-```
 
