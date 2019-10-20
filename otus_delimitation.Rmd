@@ -13,6 +13,7 @@ library(paran)
 library(splits)
 library(ape)
 library(MASS)
+library(dplyr)
 
 ```
 
@@ -120,6 +121,90 @@ plotCluster3 <- function(tr, lthresh, show.tip.label = TRUE,
        cex = cex, font=1)
 }
 
+
+plotCluster2 <- function(tr, lthresh, show.tip.label = FALSE, # tip labels to FALSE
+show.node.label = FALSE, cex = 0.5, edge.width) {
+numnod <- tr$Nnode
+numtip <- length(tr$tip.label)
+cdat <- array(1, 2 * numnod)
+ndat <- array("", numnod)
+bt <- -branching.times(tr)
+nest.nodes <- function(tr, x, p = 0) {
+numtip <- length(tr$tip.label)
+nods <- array(NA, 0)
+desc <- as.integer(tr$edge[, 2][tr$edge[, 1] == x])
+if (desc[1] > numtip) {
+nods <- c(nods, desc[1], nest.nodes(tr, desc[1]))
+}
+if (desc[2] > numtip) {
+nods <- c(nods, desc[2], nest.nodes(tr, desc[2]))
+}
+if (length(nods) > 0) {
+return(nods)
+}
+else {
+return(NULL)
+}
+}
+threshold.group <- function(mrcas) {
+parent <- tr$edge[, 1]
+child <- tr$edge[, 2]
+thresh.group <- list()
+thresh.time <- c()
+mrcas <- mrcas + numtip
+k <- 1
+while (TRUE) {
+times <- bt[mrcas - numtip]
+thresh1.time <- min(times)
+thresh1.node <- mrcas[which.min(times)]
+mrcas <- mrcas[-which.min(times)]
+if (length(mrcas) == 0) {
+thresh.time <- c(thresh.time, thresh1.time)
+thresh.group[[k]] <- thresh1.node
+break
+}
+member <- thresh1.node
+del <- c()
+for (i in 1:length(mrcas)) {
+par.nod <- parent[child == mrcas[i]]
+t.par <- bt[par.nod - numtip]
+if (t.par < thresh1.time) {
+member <- c(member, mrcas[i])
+del <- c(del, i)
+}
+}
+thresh.time <- c(thresh.time, thresh1.time)
+thresh.group[[k]] <- member
+k <- k + 1
+if (length(del) != 0) {
+mrcas <- mrcas[-del]
+}
+if (length(mrcas) == 0) {
+break
+}
+}
+return(thresh.group)
+}
+group <- threshold.group(lthresh)
+colors <- rainbow(length(group))
+k <- 1
+for (g in group) {
+n.col.type <- rep(0, numnod)
+for (j in 1:length(g)) {
+n.col.type[g[j] - numtip] <- 2
+n.col.type[nest.nodes(tr, g[j]) - numtip] <- 1
+}
+cdat[match(tr$edge[, 1], which((n.col.type == 1) |
+(n.col.type == 2)) + numtip) > 0] <-
+colors[k]
+k <- k + 1
+}
+plot(tr, edge.color = cdat, use.edge.length = 1, show.node.label =
+show.node.label,
+show.tip.label = show.tip.label, no.margin = FALSE,
+cex = cex, edge.width=edge.width)
+}
+
 ```
 
 Plot with the new fuction plotCluster3 and add edges number to know wich one correspodns to each OTU| Graficarlo con la nueva función plotCluster3
@@ -156,4 +241,149 @@ edgelabels(frame="none", adj = c(0.5, -0.25), cex=0.8)
 }
 
 ```
+
+### Check OTUs are named correctly in the trees edges:
+
+REad data with assiged OTUs, will be used to compare in the trees
+```{r}
+# read data
+samples_otus<-read.delim("samples_OTUs.txt") %>%
+              dplyr::arrange(., OTU) %>% # order by otu
+              mutate(., OTU=as.factor(OTU)) # otu as character not number
+
+levels(samples_otus$OTU)<-unique(samples_otus$OTU) # add levels so that it plots nice (cant use integer because there is not otu 9)
+```
+
+
+Curculionidae
+
+```{r, results="hide", fig.width=12, fig.height=11}
+Ttree<-read.nexus("trees/CurculionidaeTtree")
+
+# run gmyc
+Tgmyc<-gmyc(Ttree, method="single", interval=c(0,10),quiet=F)
+
+x<-Tgmyc
+
+# get which CROP OTU is each tip
+nomtips<-(x$tr)$tip.label
+nomtips<-as.data.frame(nomtips)
+
+otu_tips<-inner_join(nomtips, samples_otus, by=c("nomtips"="sample_id"))
+
+
+## PLOT
+layout(matrix(c(1,1,2,3), 2, 2, byrow = TRUE),
+       heights=c(2,1))
+
+# plot tree according to habitat type
+par(mar=c(0, 4, 2.5, 4))
+plotCluster2(x$tree, x$MRCA[[which.max(x$likelihood)]], edge.width=2)
+tiplabels(text=otu_tips$OTU, frame="none", col="black", cex=.60, adj=0, offset = 0.006)
+tiplabels(text=(x$tr)$tip.label, frame="none", col="black", cex=.5, adj=0, offset= 0.016)
+title(main="Curculionidae (Coleoptera) \na)",adj=0, cex.main=1.5)
+
+# add OTU names
+edgelabels(text=c("OTU 5", "OTU 4", "OTU 3", "OTU 2", "OTU 7", "OTU 6", "OTU 1"), edge=c(54, 51, 24, 15, 14, 13, 4), frame="none", adj = c(0.5, -0.25), cex=.7, date= .09)
+```
+
+
+
+Carabideae
+```{r, echo=FALSE, results= "hide", fig.width=12, fig.height=12}
+Ttree<-read.nexus("trees/CarabidaeTtree")
+
+# run gmyc
+Tgmyc<-gmyc(Ttree, method="single", interval=c(0,10),quiet=F)
+
+# change tips
+x<-Tgmyc
+
+# get which CROP OTU is each tip
+nomtips<-(x$tr)$tip.label
+nomtips<-as.data.frame(nomtips)
+
+otu_tips<-inner_join(nomtips, samples_otus, by=c("nomtips"="sample_id"))
+
+
+## PLOT
+layout(matrix(c(1,1,2,3), 2, 2, byrow = TRUE),
+       heights=c(3,1.2))
+
+# plot tree according to habitat type
+par(mar=c(0, 4, 2.5, 4))
+plotCluster2(x$tree, x$MRCA[[which.max(x$likelihood)]], edge.width=2)
+tiplabels(text=otu_tips$OTU, frame="none", col="black", cex=.6, adj=0, offset = 0.006)
+tiplabels(text=(x$tr)$tip.label, frame="none", col="black", cex=.5, adj=0, offset= 0.016)
+title("Carabidae (Coleoptera) \na)",adj=0, cex.main=1.5)
+
+# add OTU names
+edgelabels(text=c("OTU 11", "OTU 10"), edge=c(38,1), frame="none", adj = c(0.5, -0.25), cex=.8, date= .2)
+```
+
+
+
+Linyphiidae. 
+
+```{r, echo=FALSE, results= "hide", fig.width=13, fig.height=32}
+Ttree<-read.nexus("trees/LinyphiidaeTtree")
+
+# run gmyc
+Tgmyc<-gmyc(Ttree, method="single", interval=c(0,10),quiet=F)
+
+x<-Tgmyc
+
+# get which CROP OTU is each tip
+nomtips<-(x$tr)$tip.label
+nomtips<-as.data.frame(nomtips)
+
+otu_tips<-inner_join(nomtips, samples_otus, by=c("nomtips"="sample_id"))
+
+####
+
+# plot tree according to habitat type and otus name
+par(mar=c(0, 4, 2.5, 4))
+plotCluster2(x$tree, x$MRCA[[which.max(x$likelihood)]], edge.width=2)
+tiplabels(text=otu_tips$OTU, frame="none", col="black", cex=.50, adj=0, offset = 0.006)
+tiplabels(text=(x$tr)$tip.label, frame="none", col="black", cex=.4, adj=0, offset= 0.016)
+title("Linyphiidae (Aranae) \na)",adj=0, cex.main=1.5)
+
+# add OTU names
+edgelabels(text=c("OTU 31", "OTU 28", "OTU 27",  "OTU 34", "OTU 26", "OTU 38", "OTU 25", "OTU 24", "OTU 23", "OTU 29", "OTU 22", "OTU 21", "OTU 20", "OTU 19", "OTU 18", "OTU 33", "OTU 18", "OTU 35", "OTU 17", "OTU 16", "OTU 32", "OTU 15", "OTU 14", "OTU 13", "OTU 36", "OTU 30", "OTU 37", "OTU 12"), 
+           edge=c(256, 245, 236, 235, 220, 215, 203, 196, 192, 190, 187, 180, 159, 150, 130, 129, 122, 118, 103, 100, 98, 62, 37, 15, 13, 9, 8, 2),
+           frame="none", adj = c(0.5, -0.25), cex=.6)
+```
+
+
+
+Gnaphosidae
+```{r, echo=FALSE, results= "hide", fig.width=12, fig.height=8}
+Ttree<-read.nexus("trees/GnaphosidaeTtree")
+
+# run gmyc
+Tgmyc<-gmyc(Ttree, method="single", interval=c(0,10),quiet=F)
+x<-Tgmyc
+
+# get which CROP OTU is each tip
+nomtips<-(x$tr)$tip.label
+nomtips<-as.data.frame(nomtips)
+
+otu_tips<-inner_join(nomtips, samples_otus, by=c("nomtips"="sample_id"))
+
+## PLOT
+layout(matrix(c(1,1,2,3), 2, 2, byrow = TRUE))
+
+# plot tree according to habitat type
+par(mar=c(0, 4, 2.5, 4))
+plotCluster2(x$tree, x$MRCA[[which.max(x$likelihood)]], edge.width=2)
+tiplabels(text=otu_tips$OTU, frame="none", col="black", cex=.7, adj=0, offset = 0.006)
+tiplabels(text=(x$tr)$tip.label, frame="none", col="black", cex=.5, adj=0, offset= 0.016)
+title("Gnaphosidae (Aranae) \na)",adj=0, cex.main=1.5)
+
+# Plot OTUs name
+edgelabels(text=c("OTU 45", "OTU 44", "OTU 43", "OTU 42", "OTU 41", "OTU 40", "OTU 39"), edge=c(38, 35, 32, 26, 23, 10, 3), frame="none", adj = c(0.5, -0.25), cex=.8, date= .1)
+```
+
+
+
 

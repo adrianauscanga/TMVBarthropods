@@ -185,7 +185,8 @@ abline(v=-0.03913536, col="red")
 
 ```
 
-Repeat with all trees w/o code:
+
+### Full figures for all Families:
 
 
 Curculionidae
@@ -224,7 +225,7 @@ edgelabels(text=c("OTU 5", "OTU 4", "OTU 3", "OTU 2", "OTU 7", "OTU 6", "OTU 1")
 # plot Time vs likelihood
 par(mar=c(4, 4, 2, 4))
 plot(x$threshold.time, x$likelihood,type = "l", xlab = "Time", ylab = "Likelihood", cex.lab=1.5, cex.axis=1.5, lwd=2)
-title(main="a)",adj=0, cex.main=1.5)
+title(main="b)",adj=0, cex.main=1.5)
 
 # plot time vs number of entityes and threshold time
 par(mar=c(4, 4, 2, 4))
@@ -233,7 +234,6 @@ abline(v=-0.03913536, col="red", lwd=2)
 title(main="c)",adj=0, cex.main=1.5)
 
 ```
-
 
 
 
@@ -264,7 +264,7 @@ par(mar=c(0, 4, 2.5, 4))
 plotCluster2(x$tree, x$MRCA[[which.max(x$likelihood)]], edge.width=2)
 tiplabels(pch=15, col=as.vector(samtips), adj=0, offset=0.51, cex=1.5)
 tiplabels(text=nomtips, frame="none", col="black", cex=1, adj=0, offset = 0.018)
-title("Carabidae (Coleoptera) \nb)",adj=0, cex.main=1.5)
+title("Carabidae (Coleoptera) \na)",adj=0, cex.main=1.5)
 
 # add OTU names
 edgelabels(text=c("OTU 11", "OTU 10"), edge=c(38,1), frame="none", adj = c(0.5, -0.25), cex=.8, date= .2)
@@ -313,7 +313,7 @@ plotCluster2(x$tree, x$MRCA[[which.max(x$likelihood)]], edge.width=2)
 tiplabels(pch=15, col=as.vector(samtips), adj=0, offset=0.51, cex=1.5)
 tiplabels(text=otu_tips$OTU, frame="none", col="black", cex=.50, adj=0, offset = 0.006)
 tiplabels(text=(x$tr)$tip.label, frame="none", col="black", cex=.4, adj=0, offset= 0.016)
-title("Linyphiidae (Aranae) \nc)",adj=0, cex.main=1.5)
+title("Linyphiidae (Aranae) \na)",adj=0, cex.main=1.5)
 
 # add OTU names
 edgelabels(text=c("OTU 31", "OTU 28", "OTU 27",  "OTU 34", "OTU 26", "OTU 38", "OTU 25", "OTU 24", "OTU 23", "OTU 29", "OTU 22", "OTU 21", "OTU 20", "OTU 19", "OTU 18", "OTU 33", "OTU 18", "OTU 35", "OTU 17", "OTU 16", "OTU 32", "OTU 15", "OTU 14", "OTU 13", "OTU 36", "OTU 30", "OTU 37", "OTU 12"), 
@@ -349,7 +349,7 @@ par(mar=c(0, 4, 2.5, 4))
 plotCluster2(x$tree, x$MRCA[[which.max(x$likelihood)]], edge.width=2)
 tiplabels(pch=15, col=as.vector(samtips), adj=0, offset=0.51, cex=1.5)
 tiplabels(text=nomtips, frame="none", col="black", cex=1, adj=0, offset = 0.018)
-title("Linyphiidae (Aranae) \nc)",adj=0, cex.main=1.5)
+title("Linyphiidae (Aranae) \na)",adj=0, cex.main=1.5)
 
 # add OTU names
 edgelabels(text=c("OTU 31", "OTU 28", "OTU 27",  "OTU 34", "OTU 26", "OTU 38", "OTU 25", "OTU 24", "OTU 23", "OTU 29", "OTU 22", "OTU 21", "OTU 20", "OTU 19", "OTU 18", "OTU 33", "OTU 18", "OTU 35", "OTU 17", "OTU 16", "OTU 32", "OTU 15", "OTU 14", "OTU 13", "OTU 36", "OTU 30", "OTU 37", "OTU 12"), 
@@ -395,7 +395,7 @@ par(mar=c(0, 4, 2.5, 4))
 plotCluster2(x$tree, x$MRCA[[which.max(x$likelihood)]], edge.width=2)
 tiplabels(pch=15, col=as.vector(samtips), adj=0, offset=0.51, cex=1.5)
 tiplabels(text=nomtips, frame="none", col="black", cex=1, adj=0, offset = 0.018)
-title("Gnaphosidae (Aranae) \nd)",adj=0, cex.main=1.5)
+title("Gnaphosidae (Aranae) \na)",adj=0, cex.main=1.5)
 
 # Plot OTUs name
 edgelabels(text=c("OTU 45", "OTU 44", "OTU 43", "OTU 42", "OTU 41", "OTU 40", "OTU 39"), edge=c(38, 35, 32, 26, 23, 10, 3), frame="none", adj = c(0.5, -0.25), cex=.8, date= .1)
