@@ -368,7 +368,7 @@ x<-Tgmyc
 nomtips<-(x$tr)$tip.label
 nomtips<-as.data.frame(nomtips)
 
-otu_tips<-inner_join(nomtips, samples_otus, by=c("nomtips"="sample_id"))
+otu_tips<-left_join(nomtips, samples_otus, by=c("nomtips"="sample_id"))
 
 ## PLOT
 layout(matrix(c(1,1,2,3), 2, 2, byrow = TRUE))
