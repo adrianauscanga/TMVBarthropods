@@ -269,9 +269,8 @@ ggplot(data= tab, aes(x=A1, y=A2, label=rownames(tab))) + geom_text(size=4, aes(
       ylab(paste0("component 2 explaining ", 
                   round(PCoA$eig[2]/sum(PCoA$eig)*100, 2), "%")) +
       xlab(paste0("component 1 explaining ", 
-                  round(PCoA$eig[1]/sum(PCoA$eig)*100, 2), "%")) + 
-      scale_colour_discrete(name="TMVB origin") +
-      theme_bw()
+                  round(PCoA$eig[1]/sum(PCoA$eig)*100, 2), "%")) +      
+      theme_bw() + theme(legend.position="none")
   
 
 ```
