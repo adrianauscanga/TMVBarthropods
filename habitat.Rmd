@@ -48,7 +48,7 @@ ggplot(samples_otus, aes(x=OTU, fill=vegetation_type)) +
     geom_bar() +  theme_bw() +
   facet_wrap(. ~ family, scales="free_x")  +
   scale_fill_manual(values=c("darkolivegreen3", "darkorange"),
-                      name="Vegetation type") +
+                      name="Habitat") +
     theme(legend.title=element_text(size=13),
           legend.text=element_text(size=12),
           axis.title.x = element_text(size=13),
