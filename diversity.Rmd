@@ -248,8 +248,8 @@ Make a cluster and a PCoA to visualize the results. | Se calcula una matriz de d
 OTUs<-as.matrix(OTUs) #La convertimos en matriz
 OTUs<-t(OTUs) #Trasponemos la matriz para que las especies sean las columnas (variables) y los sitios los renglones.
 OTUs.PA<-OTUs>0 #T and F instead of number of individuals
-
 OTUsdist<-betadiver(OTUs.PA,method=1)
+OTUsdist # print pairwise betadiv
 cluster<-hclust(OTUsdist)
 plot(cluster)
 PCoA<-dudi.pco(sqrt(OTUsdist),scannf=F)
