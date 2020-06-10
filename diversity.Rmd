@@ -239,6 +239,7 @@ OTUs.PA<-OTUs>0 #T and F instead of number of individuals
 mode(OTUs.PA)<-"integer" # T=1 y F=0
 head(OTUs)
 OTUs.PA
+colSums(OTUs.PA)
 ```
 
 Calculate a matrix distance using the function betadiver. If you want o take a look at all indeces in this function, run betadiver(HELP=T). Option 10 and 11 are similarity indeces, the rest are distance indeces. 
