@@ -28,7 +28,7 @@ levels(samples_otus$OTU)<-unique(samples_otus$OTU) # add levels so that it plots
 # plot
 ggplot(samples_otus, aes(x=OTU, fill=vegetation_type)) +
     geom_bar() + theme_bw() +
-    scale_fill_manual(values=c("darkolivegreen3", "darkorange"),
+    scale_fill_manual(values=c("green4", "orange"),
                       name="Vegetation type") +
     theme(legend.title=element_text(size=13),
           legend.text=element_text(size=12),
@@ -47,7 +47,7 @@ Bar plot by family:
 ggplot(samples_otus, aes(x=OTU, fill=vegetation_type)) +
     geom_bar() +  theme_bw() +
   facet_wrap(. ~ family, scales="free_x")  +
-  scale_fill_manual(values=c("darkolivegreen3", "darkorange"),
+  scale_fill_manual(values=c("green4", "orange"),
                       name="Habitat") +
     theme(legend.title=element_text(size=13),
           legend.text=element_text(size=12),
@@ -165,7 +165,7 @@ samtips<-substr((x$tr)$tip.label, 3,3)
 samtips #habitat
 #Definir color por tipo de vegetación (samtips)
 samtips<-as.factor(samtips)
-levels(samtips)<-c("darkolivegreen3", "darkorange")
+levels(samtips)<-c("green4", "orange")
 samtips
 
 # plot tree according to habitat type
@@ -205,7 +205,7 @@ samtips<-substr((x$tr)$tip.label, 3,3)
 samtips #habitat
 #Definir color por tipo de vegetación (samtips)
 samtips<-as.factor(samtips)
-levels(samtips)<-c("darkolivegreen3", "darkorange")
+levels(samtips)<-c("green4", "orange")
 samtips
 
 ## PLOT
@@ -252,7 +252,7 @@ samtips<-substr((x$tr)$tip.label, 3,3)
 samtips #habitat
 #Definir color por tipo de vegetación (samtips)
 samtips<-as.factor(samtips)
-levels(samtips)<-c("darkolivegreen3", "darkorange")
+levels(samtips)<-c("green4", "orange")
 samtips
 
 ## PLOT
@@ -296,7 +296,7 @@ samtips<-substr((x$tr)$tip.label, 3,3)
 samtips #habitat
 #Definir color por tipo de vegetación (samtips)
 samtips<-as.factor(samtips)
-levels(samtips)<-c("darkolivegreen3", "darkorange")
+levels(samtips)<-c("green4", "orange")
 samtips
 
 # get which CROP OTU is each tip
@@ -337,7 +337,7 @@ samtips<-substr((x$tr)$tip.label, 3,3)
 samtips #habitat
 #Definir color por tipo de vegetación (samtips)
 samtips<-as.factor(samtips)
-levels(samtips)<-c("darkolivegreen3", "darkorange")
+levels(samtips)<-c("green4", "orange")
 samtips
 
 ## PLOT
@@ -384,7 +384,7 @@ samtips<-substr((x$tr)$tip.label, 3,3)
 samtips #habitat
 #Definir color por tipo de vegetación (samtips)
 samtips<-as.factor(samtips)
-levels(samtips)<-c("darkolivegreen3", "darkorange")
+levels(samtips)<-c("green4", "orange")
 samtips
 
 ## PLOT
