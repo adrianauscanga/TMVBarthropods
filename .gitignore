@@ -1,0 +1,13 @@
+## Ignore raster files for habitat area (they are in Dryad repo Mastretta-Yanes et al 2018)
+
+/spatial/alt3100.asc
+/spatial/alt3200.asc
+/spatial/alt3500.asc
+/spatial/alt3900.asc
+/spatial/alt_tmvb.asc
+
+## Ignore anoying R and Mac files
+.DS_Store
+.RData
+.Rapp.history
+.Rhistory
