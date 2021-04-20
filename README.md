@@ -1,9 +1,7 @@
 # TMVBarthropods
-This is the repository for data used in my master's thesis project *"Comparative Phylogeography of high mountain arthropods in the TMVB"*.
-This repository contains code for delimiting Operational Taxonomic Units (OTUs) using a Generalized Mixed Yule Coalescent method (GMYC), estimate genetic and specific diversity, and run a null model. It also contains the sequences and trees needed to run the code.
+This is the repository for data used in my master's thesis project *"Evaluating species origins within tropical sky-islands arthropod communities"*, published in the Journal of Biogeography.
+This repository contains code for delimiting Operational Taxonomic Units (OTUs) using a Generalized Mixed Yule Coalescent method (GMYC) and CROP, estimate genetic and specific diversity, and run a null model. It also contains the sequences and trees needed to run the code.
 Here is a brief description of the files contained in this repo:
-
-The following scripts should be run in this order:
 
 **otus_delimitation**. R code for delimiting OTUs using trees calculated in BEAST
 
